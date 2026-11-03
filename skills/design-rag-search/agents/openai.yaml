@@ -1,0 +1,6 @@
+interface:
+  display_name: "Design_RAG MCP 证据检索"
+  short_description: "通过只读 MCP 查询项目、材料和带来源依据的设计知识"
+  default_prompt: "Use $design-rag-search with the configured design-rag MCP server. Resolve the project first, retrieve only read-only evidence, distinguish document confirmation from visual inference, and cite project, file, page or section, source_id, and evidence type for every substantive conclusion."
+policy:
+  allow_implicit_invocation: true

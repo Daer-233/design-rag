@@ -1,0 +1,55 @@
+apiVersion: langbot/v1
+kind: Runner
+metadata:
+  name: knowledge
+  label:
+    en_US: Work Knowledge Assistant
+    zh_Hans: 工作知识助手
+  description:
+    en_US: Read-only workplace knowledge answers with pictures, versions and citations.
+    zh_Hans: 查询已发布知识，保留原文顺序、图片和来源；支持版本选择与分页。
+spec:
+  usages: [agent]
+  capabilities:
+    streaming: false
+    tool_calling: false
+    knowledge_retrieval: false
+    multimodal_input: false
+    interrupt: false
+    steering: false
+    interactions: false
+  permissions:
+    models: []
+    tools: []
+    knowledge_bases: []
+    history: []
+    events: []
+    storage: []
+    interactions: []
+  config:
+    - name: service_url
+      type: string
+      required: true
+      default: http://host.docker.internal:8060
+      label: {en_US: Local knowledge service, zh_Hans: 本机知识服务地址}
+      description: {en_US: Use host.docker.internal in Docker or 127.0.0.1 on the host., zh_Hans: Docker 使用 host.docker.internal；本机运行使用 127.0.0.1。仅允许本机地址。}
+    - name: category_id
+      type: string
+      default: ''
+      label: {en_US: Category ID (optional), zh_Hans: 分类 ID（选填）}
+    - name: product
+      type: string
+      default: ''
+      label: {en_US: Applicable system or audience (optional), zh_Hans: 适用系统或对象（选填）}
+    - name: version
+      type: string
+      default: ''
+      label: {en_US: Version (optional), zh_Hans: 适用版本（选填）}
+    - name: timeout_seconds
+      type: integer
+      default: 120
+      label: {en_US: Query timeout (seconds), zh_Hans: 查询超时（秒）}
+execution:
+  python:
+    path: ./knowledge.py
+    attr: KnowledgeRunner

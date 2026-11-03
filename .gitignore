@@ -1,0 +1,16 @@
+node_modules/
+.venv/
+venv/
+__pycache__/
+.env
+.env.local
+.env.*.local
+*.db
+*.sqlite*
+*.log
+*.pid
+*.tar
+*.zip
+*.exe
+data/
+backups/

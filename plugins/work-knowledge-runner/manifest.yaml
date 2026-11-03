@@ -1,0 +1,24 @@
+apiVersion: langbot/v1
+kind: Plugin
+metadata:
+  author: liwj
+  name: WorkKnowledgeAssistant
+  version: 0.1.0
+  description:
+    en_US: Evidence-based workplace answers with source text and images from your local knowledge service.
+    zh_Hans: 连接本机工作知识助手，返回 IT、入职、财务及运营知识的原文、图片与来源。
+  label:
+    en_US: Work Knowledge Assistant
+    zh_Hans: 工作知识助手
+  icon: assets/icon.svg
+spec:
+  config: []
+  components:
+    Runner:
+      fromDirs:
+        - path: components/runner/
+          maxDepth: 1
+execution:
+  python:
+    path: main.py
+    attr: WorkKnowledgePlugin

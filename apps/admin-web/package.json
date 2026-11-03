@@ -1,0 +1,23 @@
+{
+  "name": "design-rag-admin-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "node scripts/build-admin-safe.mjs",
+    "clean:dist": "powershell -NoProfile -Command \"if (Test-Path dist) { [System.IO.Directory]::Delete((Resolve-Path dist).Path, \\$true) }\"",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^6.3.2",
+    "antd": "^6.6.1",
+    "pinyin-pro": "3.29.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.0"
+  }
+}

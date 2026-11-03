@@ -1,0 +1,6 @@
+interface:
+  display_name: "Design_RAG 图文证据检索"
+  short_description: "通过只读 MCP 返回设计文字依据及其关联图片引用"
+  default_prompt: "Use $design-rag-visual-search with the configured design-rag MCP server. Resolve the project first, retrieve text evidence with include_images enabled, show only directly related de-duplicated image references when they help, and clearly separate document facts from visual observations."
+policy:
+  allow_implicit_invocation: true

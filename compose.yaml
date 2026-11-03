@@ -1,0 +1,47 @@
+name: design-rag
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - type: bind
+        source: ${POSTGRES_DATA_DIR:?set POSTGRES_DATA_DIR in .env}
+        target: /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  qdrant:
+    image: qdrant/qdrant:v1.19.0
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${QDRANT_PORT:-6333}:6333"
+      - "127.0.0.1:${QDRANT_GRPC_PORT:-6334}:6334"
+    volumes:
+      # Docker Desktop presents Windows bind mounts to Qdrant as an unsupported filesystem.
+      # Qdrant is rebuildable, so its live index is in a Docker-managed volume; snapshots stay on I:.
+      - qdrant_storage:/qdrant/storage
+      - type: bind
+        source: ${QDRANT_SNAPSHOTS_DIR:?set QDRANT_SNAPSHOTS_DIR in .env}
+        target: /qdrant/snapshots
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/6333'"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+volumes:
+  qdrant_storage:
+    name: design-rag-qdrant-storage
+
