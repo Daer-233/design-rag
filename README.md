@@ -9,9 +9,29 @@
 - 第 3 步：BGE-M3 CPU 本地 Embedding 服务，端口 `8031`，输出 Dense（1024 维）+ Sparse 向量。
 - 第 4 步：BGE-Reranker-v2-m3 CPU 本地 Rerank 服务，端口 `8032`。
 - **第 5 步：Backend RAG 编排已实现**：父子分块权威入库、父块/子块双写 Qdrant、子块混合召回、检索前权限过滤、粗排序、重排序、父块上下文与证据/引用返回。
-- **第 6 步（进行中）**：MinerU 文件归档、持久化解析任务、显式外发提交、状态轮询、结果归档及 Markdown → 父子分块标准化已实现；gpt-5.6-terra（经 Now Coding OpenAI 兼容网关）图片理解已实现为独立、显式提交的持久化任务。问题重构与基于证据的最终回答尚未接入。
+- **第 6 步（进行中）**：MinerU 文件归档、持久化解析任务、显式外发提交、状态轮询、结果归档及 Markdown → 父子分块标准化已实现；gpt-5.6-terra（经 Now Coding OpenAI 兼容网关）图片理解已实现为独立、显式提交的持久化任务。网页 Agent 已通过 LangGraph 接入意图分流、按需改写与证据回答。
 
 模型权重只通过 **ModelScope** 下载；Embedding/Rerank 运行时强制 Hugging Face/Transformers 离线，不会从 Hugging Face 拉取模型权重。
+
+## 网页 Agent 工作流
+
+网页 Agent 使用 [LangGraph](https://github.com/langchain-ai/langgraph) 编排问答。检索节点调用 DesignRAG 的检索服务，复用父子分块、混合召回、重排和来源定位。
+
+```mermaid
+flowchart LR
+    A["网页 Agent 收到问题"] --> B["本地 BERT 意图分类"]
+    B -->|设计专业问题| C["必要时根据近期对话改写"]
+    C --> D["检索与重排设计资料"]
+    D --> E["回填父块并整理证据"]
+    E --> F["依据证据回答并附引用"]
+    B -->|日常问题| G["直接生成通用回答"]
+```
+
+- 专业问题只使用本轮选中的证据。证据不足时明确提示，回答服务不可用时保留已找到的引用。
+- 日常问题不调用设计知识库。网页 Agent 与面向外部调用方的受控检索 API 分别配置。详见 [Agent 检索 API](docs/agent-retrieval-api.md)。
+- LangGraph 节点见 [Agent 源码](apps/backend/app/services/agent_workflow.py)。`langchain-community` 属于 RAGAS 评测依赖，网页问答通过现有模型接口和检索服务执行。
+
+在干净克隆上验证了 FastAPI 和 Agent 依赖装配。现有 Agent 工作流与 API 安全测试 **11 项通过**。另用 8 个合成场景对比了新旧实现的输出、事件和检索参数，覆盖日常分流、证据不足、BERT 降级、改写成功与失败、引用过滤和回答服务故障。上述验证使用模拟模型及资料。
 
 ## 服务端口
 
@@ -41,7 +61,7 @@ Qdrant 保存父块和子块两类可重建索引点：`chunk_id`、`chunk_level
 
 ```text
 原始问题（保留）
-  → 当前有效问题（第 5 步等于原始问题；第 6 步可附加问题重构）
+  → 当前有效问题（网页 Agent 可按需消解指代）
   → 项目权限校验 + Qdrant Payload 硬过滤
   → BGE-M3 Dense + Sparse 仅召回子块 Top 100（父块也已索引，但默认不参与召回）
   → Backend 以 RRF 融合
@@ -49,7 +69,7 @@ Qdrant 保存父块和子块两类可重建索引点：`chunk_id`、`chunk_level
   → 可解释粗排序 Top 40（按子块）
   → BGE-Reranker-v2-m3 精排 Top 6（按子块）
   → 返回 Top 8 子块证据、父块上下文和来源引用
-  → 第 6 步由 gpt-5.6-terra（经 Now Coding）仅基于这些证据生成回答
+  → 网页 Agent 调用配置的回答服务，仅依据本轮证据生成回答
 ```
 
 粗排序默认权重：RRF 融合分 60%、元数据匹配 15%、审核状态 10%、来源可信度 10%、来源质量 5%。每项结果会返回该分数分解，便于调试与评估。
