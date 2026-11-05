@@ -9,7 +9,7 @@
 - 第 3 步：BGE-M3 CPU 本地 Embedding 服务，端口 `8031`，输出 Dense（1024 维）+ Sparse 向量。
 - 第 4 步：BGE-Reranker-v2-m3 CPU 本地 Rerank 服务，端口 `8032`。
 - **第 5 步：Backend RAG 编排已实现**：父子分块权威入库、父块/子块双写 Qdrant、子块混合召回、检索前权限过滤、粗排序、重排序、父块上下文与证据/引用返回。
-- **第 6 步（进行中）**：MinerU 文件归档、持久化解析任务、显式外发提交、状态轮询、结果归档及 Markdown → 父子分块标准化已实现；gpt-5.6-terra（经 Now Coding OpenAI 兼容网关）图片理解已实现为独立、显式提交的持久化任务。网页 Agent 已通过 LangGraph 接入意图分流、按需改写与证据回答。
+- **第 6 步（进行中）**：MinerU 文件归档、持久化解析任务、显式外发提交、状态轮询、结果归档及 Markdown → 父子分块标准化已实现；gpt-5.6-terra 图片理解已实现为独立、显式提交的持久化任务。网页 Agent 已通过 LangGraph 接入意图分流、按需改写与证据回答。
 
 模型权重只通过 **ModelScope** 下载；Embedding/Rerank 运行时强制 Hugging Face/Transformers 离线，不会从 Hugging Face 拉取模型权重。
 
