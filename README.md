@@ -249,7 +249,7 @@ conda run -n design-rag python .\scripts\normalize-pptx-for-mineru.py `
 - `POST /api/v1/visual-analysis-jobs/{job_id}/submit`：外发至 GPT；适用于普通设计图，或 OCR 完成后的文字密集设计图。
 
 DWG/DXF 仍需 CAD 专用解析器。
-## GPT 图片理解（Now Coding，显式外发）
+## GPT 图片理解
 
 图片理解采用与 MinerU 相同的“**本地任务先创建、明确提交才外发**”原则。普通 PNG、JPG、JPEG 或 WEBP 可从已归档的原图直接创建视觉任务；`ocr_and_vision` 路由则必须先成功 `materialize` MinerU OCR 结果后创建视觉任务。API 不会读取本地目录中的任意文件，也不会在创建任务时向第三方发送图像。
 
