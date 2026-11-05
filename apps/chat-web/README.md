@@ -24,4 +24,4 @@ It runs the Node/Vite bundle in memory and writes validated bundle bytes with .N
 
 - [React / React DOM](https://github.com/facebook/react)：渲染 Web 界面。
 - [Vite](https://github.com/vitejs/vite)：本地开发与前端构建。
-- [@vitejs/plugin-react](https://www.npmjs.com/package/@vitejs/plugin-react)：为 Vite 提供 React 编译支持。
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react)：为 Vite 提供 React 编译支持。
